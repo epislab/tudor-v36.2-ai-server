@@ -1,4 +1,3 @@
-from icecream import ic
 from sklearn.svm import SVC
 import pandas as pd
 from app.domain.service.titanic_service import TitanicService

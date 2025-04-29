@@ -1,16 +1,17 @@
-from com.epislab.models.crime_service import CrimeService
-from com.epislab.models.dataset import Dataset
-
+from xarray import Dataset
+from app.domain.service.crime_service import CrimeService
 
 class CrimeController:
-    dataset = Dataset()
-    service = CrimeService()
-    def modeling(self, *args):
+    def __init__(self):
+        self.dataset = Dataset()
+        self.service = CrimeService()
+
+    def preprocess(self, *args):
         this = self.service.preprocess(*args)
-        # self.print_this(this)
+        self.print_this(this)
         return this
-    @staticmethod
-    def print_this(this):
+
+    def print_this(self, this):
         print('*' * 100)
         print(f'1. cctv 의 type \n {type(this.cctv)} ')
         print(f'2. cctv 의 column \n {this.cctv.columns} ')

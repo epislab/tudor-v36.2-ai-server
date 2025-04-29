@@ -11,8 +11,8 @@ from contextlib import asynccontextmanager
 import json
 from pydantic import BaseModel
 
-from gateway.app.domain.model.service_proxy_factory import ServiceProxyFactory
-from gateway.app.domain.model.service_type import ServiceType
+from app.domain.model.service_proxy_factory import ServiceProxyFactory
+from app.domain.model.service_type import ServiceType
 
 # ✅ 로깅 설정
 logging.basicConfig(

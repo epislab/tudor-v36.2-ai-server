@@ -1,35 +1,45 @@
 services:
-  
   gateway:
-    build: ./gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
     ports:
       - "9000:9000"
-    volumes:
-      - ./gateway:/app
     environment:
-      - PYTHONPATH=/app
+      - TITANIC_SERVICE_URL=http://titanic-service:9001
+      - CRIME_SERVICE_URL=http://crime-service:9002
+      - MATZIP_SERVICE_URL=http://matzip-service:9003
+    networks:
+      - ai-network
+
   titanic-service:
-    build: ./titanic-service
+    build:
+      context: ./titanic-service
+      dockerfile: Dockerfile
     ports:
       - "9001:9001"
-    volumes:
-      - ./titanic-service:/app
-    environment:
-      - PYTHONPATH=/app
+    networks:
+      - ai-network
+
   crime-service:
-    build: ./crime-service
+    build:
+      context: ./crime-service
+      dockerfile: Dockerfile
     ports:
       - "9002:9002"
-    volumes:
-      - ./crime-service:/app
-    environment:
-      - PYTHONPATH=/app
+    networks:
+      - ai-network
+
   matzip-service:
-    build: ./matzip-service
+    build:
+      context: ./matzip-service
+      dockerfile: Dockerfile
     ports:
       - "9003:9003"
-    volumes:
-      - ./matzip-service:/app
-    environment:
-      - PYTHONPATH=/app
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    driver: bridge
   
