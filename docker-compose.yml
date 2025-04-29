@@ -1,0 +1,35 @@
+services:
+  
+  gateway:
+    build: ./gateway
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./gateway:/app
+    environment:
+      - PYTHONPATH=/app
+  titanic-service:
+    build: ./titanic-service
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./titanic-service:/app
+    environment:
+      - PYTHONPATH=/app
+  crime-service:
+    build: ./crime-service
+    ports:
+      - "9002:9002"
+    volumes:
+      - ./crime-service:/app
+    environment:
+      - PYTHONPATH=/app
+  matzip-service:
+    build: ./matzip-service
+    ports:
+      - "9003:9003"
+    volumes:
+      - ./matzip-service:/app
+    environment:
+      - PYTHONPATH=/app
+  
