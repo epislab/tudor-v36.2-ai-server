@@ -5,6 +5,12 @@ from app.domain.model.reader_schema import ReaderSchema
 from sklearn import preprocessing
 from app.domain.model.google_map_schema import GoogleMapSchema
 import folium
+import logging
+from fastapi import HTTPException
+import traceback    
+from app.domain.service.crime_map_create import CrimeMapCreator
+
+logger = logging.getLogger("crime_service")
 
 class CrimeService:
     def __init__(self):
@@ -172,7 +178,22 @@ class CrimeService:
 
             print(f"🔥💧pop: {self.pop.head()}")
 
-    def draw_crime_map(self) -> object:
+    def draw_crime_map(self) -> dict:
+        """범죄 지도를 생성하고 결과를 반환합니다."""
+        try:
+            map_creator = CrimeMapCreator()
+            map_file_path = map_creator.create_map()
+            return {"status": "범죄지도를 완성했습니다.", "file_path": map_file_path}
+        except HTTPException as e:
+            logger.error(f"지도 생성 실패 (HTTPException): {e.status_code} - {e.detail}")
+            raise e
+        except Exception as e:
+            logger.error(f"지도 생성 중 예상치 못한 오류 발생: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise HTTPException(status_code=500, detail=f"지도 생성 중 예상치 못한 서버 오류: {type(e).__name__}")
+        
+
+    def draw_crime_map2(self) -> object:
         file = self.file
         reader = self.reader
         file.context = self.updated_data
@@ -225,5 +246,7 @@ class CrimeService:
                                 fill_color='#0a0a32').add_to(folium_map)
 
         folium_map.save(os.path.join(self.stored_map, 'crime_map.html'))
+
+        return {"message": '서울시의 범죄 지도가 완성되었습니다.'}
         
 
