@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from flask import json
 import pandas as pd
+import os
+
 @dataclass
 class ReaderSchema:
     def __init__(self):
-        self._context = 'C:\\Users\\pakjk\\Documents\\Tudor\\2501\\tudor\\v36.2\\ai-server\\crime-service\\app\\stored_data'
+        self._context = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'stored_data')
         self._fname = ''
     @property
     def context(self) -> str:
@@ -19,7 +20,7 @@ class ReaderSchema:
     def fname(self,fname):
         self._fname = fname
     def new_file(self)->str:
-        return self._context + self._fname
+        return os.path.join(self._context, self._fname)
     def csv_to_dframe(self) -> object:
         file = self.new_file()
         return pd.read_csv(file, thousands=',')

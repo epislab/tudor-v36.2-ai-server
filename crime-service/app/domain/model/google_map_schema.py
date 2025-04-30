@@ -12,7 +12,7 @@ class GoogleMapSchema:
 
     def _retrieve_api_key(self):
         """API 키를 가져오는 내부 메서드"""
-        return "..."  # 실제 API에서는 보안된 방법으로 가져와야 함
+        return "...."  # 실제 API에서는 보안된 방법으로 가져와야 함
 
     def get_api_key(self):
         """저장된 API 키 반환"""

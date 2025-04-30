@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from flask import json
 import googlemaps
 import pandas as pd
 
 @dataclass
-class Dataset:
+class CrimeSchema:
     cctv : object
     crime : object
     pop : object

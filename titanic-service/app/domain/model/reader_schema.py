@@ -1,6 +1,6 @@
 from dataclasses import dataclass
+import json
 
-from flask import json
 import googlemaps
 import pandas as pd
 @dataclass

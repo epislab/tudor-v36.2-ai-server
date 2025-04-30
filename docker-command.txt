@@ -37,3 +37,26 @@ docker-compose build --no-cache financeservice  # finance 서비스 캐시 없�
 docker-compose build --no-cache esgservice      # esg 서비스 캐시 없이 재빌드
 docker-compose build --no-cache stockservice    # stock 서비스 캐시 없이 재빌드
 psql -U postgres -d your_database_name
+
+
+
+docker-compose down  
+모든 관련 이미지를삭제:
+docker rmi $(docker images 'ai-server*' -q)  
+Docker 캐시 정리  
+docker system prune -a 
+다시 빌드 
+docker-compose build --no-cache  
+컴포즈업 
+docker-compose up
+
+
+
+# 1. 컨테이너 중지
+docker-compose down
+
+# 2. crime-service만 재빌드
+docker-compose build --no-cache crime-service
+
+# 3. 서비스 재시작
+docker-compose up -d

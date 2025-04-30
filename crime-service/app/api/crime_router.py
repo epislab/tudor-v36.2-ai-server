@@ -10,8 +10,8 @@ logger.setLevel(logging.INFO)
 router = APIRouter()
 
 # GET
-@router.get("/details", summary="모든 회사 목록 조회")
-async def get_all_companies():
+@router.get("/details", summary="범죄상세세")
+async def get_crime_details():
     controller = CrimeController()
     controller.preprocess('cctv_in_seoul.csv', 'crime_in_seoul.csv', 'pop_in_seoul.xls')
     return {"message": 'SUCCESS'}

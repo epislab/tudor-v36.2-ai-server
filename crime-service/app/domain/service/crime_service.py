@@ -3,16 +3,17 @@ import pandas as pd
 import os
 from app.domain.model.reader_schema import ReaderSchema
 from sklearn import preprocessing
-from xarray import Dataset
 from app.domain.model.google_map_schema import GoogleMapSchema
+from app.domain.model.crime_schema import CrimeSchema
 
 class CrimeService:
     def __init__(self):
-        self.dataset = Dataset()
+        self.dataset = CrimeSchema()
         self.reader = ReaderSchema()
         self.crime_rate_columns = ['살인검거율', '강도검거율', '강간검거율', '절도검거율', '폭력검거율']
         self.crime_columns = ['살인', '강도', '강간', '절도', '폭력']
-        self.save_dir = 'C:\\Users\\pakjk\\Documents\\Tudor\\2501\\tudor\\v36.2\\ai-server\\crime-service\\app\\stored_data'
+        self.stored_data = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'stored_data')
+        self.updated_data = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'updated_data')
     
     def preprocess(self, *args) -> object:
         print(f"------------모델 전처리 시작-----------")
@@ -31,7 +32,7 @@ class CrimeService:
     
     def save_object_to_csv(self, this, fname) -> object:
         print(f"🌱save_csv 실행 : {fname}")
-        full_name = os.path.join(self.save_dir, fname)
+        full_name = os.path.join(self.stored_data, fname)
 
         if not os.path.exists(full_name) and fname == "cctv_in_seoul.csv":
             this.cctv = self.create_matrix(fname)
@@ -57,7 +58,7 @@ class CrimeService:
         print(f"CCTV 데이터 헤드: {this.cctv.head()}")
         cctv = this.cctv
         cctv = cctv.rename(columns={'기관명': '자치구'})
-        cctv.to_csv(os.path.join(self.save_dir, 'cctv_in_seoul.csv'), index=False)
+        cctv.to_csv(os.path.join(self.stored_data, 'cctv_in_seoul.csv'), index=False)
         this.cctv = cctv
         return this
     
@@ -99,7 +100,7 @@ class CrimeService:
         crime.loc[crime['관서명'] == '방배서', ['자치구']] == '서초구'
         crime.loc[crime['관서명'] == '수서서', ['자치구']] == '강남구'
         
-        crime.to_csv(os.path.join(self.save_dir, 'crime_in_seoul.csv'), index=False)
+        crime.to_csv(os.path.join(self.stored_data, 'crime_in_seoul.csv'), index=False)
         this.crime = crime
         return this
     
@@ -118,7 +119,7 @@ class CrimeService:
         police['폭력검거율'] = (police['폭력 검거'].astype(int) / police['폭력 발생'].astype(int)) * 100
         
         police = police.drop(columns={'살인 검거', '강도 검거', '강간 검거', '절도 검거', '폭력 검거'}, axis=1)
-        police.to_csv(os.path.join(self.save_dir, 'police_in_seoul.csv'), index=False)
+        police.to_csv(os.path.join(self.stored_data, 'police_in_seoul.csv'), index=False)
 
         # 검거율이 100%가 넘는 경우 처리
         for column in self.crime_rate_columns:
@@ -141,7 +142,7 @@ class CrimeService:
         police_norm[self.crime_rate_columns] = police[self.crime_rate_columns]
         police_norm['범죄'] = np.sum(police_norm[self.crime_rate_columns], axis=1)
         police_norm['검거'] = np.sum(police_norm[self.crime_columns], axis=1)
-        police_norm.to_csv(os.path.join(self.save_dir, 'police_norm_in_seoul.csv'))
+        police_norm.to_csv(os.path.join(self.stored_data, 'police_norm_in_seoul.csv'))
 
         this.police = police
         return this
@@ -157,7 +158,7 @@ class CrimeService:
             pop.columns[4]: '고령자'
         })
         
-        pop.to_csv(os.path.join(self.save_dir, 'pop_in_seoul.csv'), index=False)
+        pop.to_csv(os.path.join(self.stored_data, 'pop_in_seoul.csv'), index=False)
         pop.drop([26], inplace=True)
         
         pop['외국인비율'] = pop['외국인'].astype(int) / pop['인구수'].astype(int) * 100
@@ -169,6 +170,81 @@ class CrimeService:
         cor2 = np.corrcoef(cctv_pop['외국인비율'], cctv_pop['소계'])
         print(f'고령자비율과 CCTV의 상관계수 {str(cor1)} \n'
               f'외국인비율과 CCTV의 상관계수 {str(cor2)} ')
+        
+        """
+         고령자비율과 CCTV 의 상관계수 [[ 1.         -0.28078554]
+                                     [-0.28078554  1.        ]] 
+         외국인비율과 CCTV 의 상관계수 [[ 1.         -0.13607433]
+                                     [-0.13607433  1.        ]]
+        r이 -1.0과 -0.7 사이이면, 강한 음적 선형관계,
+        r이 -0.7과 -0.3 사이이면, 뚜렷한 음적 선형관계,
+        r이 -0.3과 -0.1 사이이면, 약한 음적 선형관계,
+        r이 -0.1과 +0.1 사이이면, 거의 무시될 수 있는 선형관계,
+        r이 +0.1과 +0.3 사이이면, 약한 양적 선형관계,
+        r이 +0.3과 +0.7 사이이면, 뚜렷한 양적 선형관계,
+        r이 +0.7과 +1.0 사이이면, 강한 양적 선형관계
+        고령자비율 과 CCTV 상관계수 [[ 1.         -0.28078554] 약한 음적 선형관계
+                                    [-0.28078554  1.        ]]
+        외국인비율 과 CCTV 상관계수 [[ 1.         -0.13607433] 거의 무시될 수 있는
+                                    [-0.13607433  1.        ]]                        
+         """
 
         print(f"🔥💧pop: {pop.head()}")
         return this
+    
+
+    def draw_crime_map(self) -> object:
+        file = self.file
+        reader = self.reader
+        file.context = self.updated_data
+        file.fname = 'police_norm'
+        police_norm = reader.csv(file)
+        file.context = self.stored_data
+        file.fname = 'geo_simple'
+        state_geo = reader.json(file)
+        file.fname = 'crime_in_seoul'
+        crime = reader.csv(file)
+        file.context = self.updated_data
+        file.fname = 'police_pos'
+        police_pos = reader.csv(file)
+        station_names = []
+        for name in crime['관서명']:
+            station_names.append('서울' + str(name[:-1] + '경찰서'))
+        station_addrs = []
+        station_lats = []
+        station_lngs = []
+        gmaps = reader.gmaps()
+        for name in station_names:
+            temp = gmaps.geocode(name, language='ko')
+            station_addrs.append(temp[0].get('formatted_address'))
+            t_loc = temp[0].get('geometry')
+            station_lats.append(t_loc['location']['lat'])
+            station_lngs.append(t_loc['location']['lng'])
+
+        police_pos['lat'] = station_lats
+        police_pos['lng'] = station_lngs
+        col = ['살인 검거', '강도 검거', '강간 검거', '절도 검거', '폭력 검거']
+        tmp = police_pos[col] / police_pos[col].max()
+        police_pos['검거'] = np.sum(tmp, axis=1)
+
+        folium_map = folium.Map(location=[37.5502, 126.982], zoom_start=12, title='Stamen Toner')
+
+        folium.Choropleth(
+            geo_data=state_geo,
+            data=tuple(zip(police_norm['구별'],police_norm['범죄'])),
+            columns=["State", "Crime Rate"],
+            key_on="feature.id",
+            fill_color="PuRd",
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            legend_name="Crime Rate (%)",
+            reset=True,
+        ).add_to(folium_map)
+        for i in police_pos.index:
+            folium.CircleMarker([police_pos['lat'][i], police_pos['lng'][i]],
+                                radius=police_pos['검거'][i] * 10,
+                                fill_color='#0a0a32').add_to(folium_map)
+
+        folium_map.save('./saved_data/crime_map.html')
+        
+

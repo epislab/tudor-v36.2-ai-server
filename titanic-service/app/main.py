@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 import json
 from pydantic import BaseModel
 
-from app.api.titanic_router import router as titanic_router
+from app.api.titanic_router import router as titanic_api_router
 
 # ✅ 로깅 설정
 logging.basicConfig(
@@ -55,6 +55,9 @@ app.add_middleware(
 # ✅ 서브 라우터 생성
 titanic_router = APIRouter(prefix="/titanic", tags=["Titanic Service"])
 
+# ✅ 서브 라우터와 엔드포인트를 연결함
+app.include_router(titanic_api_router, prefix="/titanic")
+
 # ✅ 서브 라우터 등록
 app.include_router(titanic_router)
 
@@ -63,6 +66,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=9001,
         reload=True
     )

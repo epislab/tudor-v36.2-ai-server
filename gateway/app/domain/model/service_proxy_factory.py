@@ -17,18 +17,8 @@ class ServiceProxyFactory:
         headers: Optional[list[tuple[bytes, bytes]]] = None,
         body: Optional[bytes] = None
     ) -> httpx.Response:
-        # ✅ service_type에 맞게 자동으로 prefix 붙이기
-        # prefixed_path = f"{self.service_type.value}/{path.lstrip('/')}"
-        # url = f"{self.base_url}/{prefixed_path}"
-        # print(f"Requesting URL: {url}")
-
-        if path == "titanic-submit":
-            path = "titanic/submit"
-        elif path == "crime-test":
-            path = "crime/test"
-        elif path == "matzip-test":
-            path = "matzip/test"
-        url = f"{self.base_url}/{path}"
+        url = f"{self.base_url}/{self.service_type.value}/{path}"
+        print(f"🎯🎯🎯 Requesting URL: {url}")
         
         # ✅ 헤더 설정 (필요 시 외부 헤더 병합 가능)
         headers_dict = {
