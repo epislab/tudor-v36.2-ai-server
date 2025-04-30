@@ -6,9 +6,9 @@ class CrimeController:
         self.service = CrimeService()
 
     def preprocess(self, *args):
-        this = self.service.preprocess(*args)
-        self.print_this(this)
-        return this
+        self.service.preprocess(*args)
 
-    def print_this(self, this):
-        print('*' * 100)
+    def draw_crime_map(self):
+        self.service.draw_crime_map()
+
+        

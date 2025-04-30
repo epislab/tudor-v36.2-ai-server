@@ -21,4 +21,4 @@ numpy==1.26.0
 scikit-learn==1.4.0 
 httpx==0.26.0
 googlemaps
-folium 
+folium==0.14.0
