@@ -25,12 +25,19 @@ docker-compose up -d
 pip install python-jose[cryptography]
 
 
-
-
-docker compose down
+docker compose down 
 docker compose build --no-cache
-docker compose up
+docker compose up -d
+
+
+docker compose -p crime-service down 
+docker compose -p crime-service build --no-cache
+docker compose -p crime-service up -d
 
 kpmg-crawler-fast-250407-production.up.railway.app
 
 docker exec -it crawler-crawler-api-1 bash -c "PGPASSWORD=YLkbHpjtkasEeLizyLxNUvtdPSlkpNaa psql -h crossover.proxy.rlwy.net -U postgres -p 27041 -d railway"
+
+
+docker compose logs --tail=500 -f gateway
+docker compose logs --tail=500 -f crime-service

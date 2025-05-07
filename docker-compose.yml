@@ -8,6 +8,10 @@ services:
     environment:
       - TITANIC_SERVICE_URL=http://titanic-service:9001
       - CRIME_SERVICE_URL=http://crime-service:9002
+      - NLP_SERVICE_URL=http://nlp-service:9003
+      - TF_SERVICE_URL=http://tf-service:9004
+    volumes:
+      - ./gateway:/app
     networks:
       - ai-network
 
@@ -17,6 +21,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "9001:9001"
+    volumes:
+      - ./titanic-service:/app
     networks:
       - ai-network
 
@@ -26,6 +32,29 @@ services:
       dockerfile: Dockerfile
     ports:
       - "9002:9002"
+    volumes:
+      - ./crime-service:/app
+    networks:
+      - ai-network
+  nlp-service:
+    build:
+      context: ./nlp-service
+      dockerfile: Dockerfile
+    ports:
+      - "9003:9003"
+    volumes:
+      - ./nlp-service:/app
+    networks:
+      - ai-network
+
+  tf-service:
+    build:
+      context: ./tf-service
+      dockerfile: Dockerfile
+    ports:
+      - "9004:9004"
+    volumes:
+      - ./tf-service:/app
     networks:
       - ai-network
 

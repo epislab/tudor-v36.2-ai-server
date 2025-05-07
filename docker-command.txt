@@ -9,6 +9,7 @@ docker-compose up -d financeservice    # finance 서비스만 백그라운드로
 docker-compose up -d esgservice        # esg 서비스만 백그라운드로 실행
 docker-compose up -d stockservice      # stock 서비스만 백그라운드로 실행
 # 로그 확인
+docker logs ai-server-tf-service-1
 docker-compose logs --tail=500 -f gateway         # gateway 서비스 로그 확인
 docker-compose logs --tail=500 -f financeservice  # finance 서비스 로그 확인
 docker-compose logs --tail=500 -f esgservice      # esg 서비스 로그 확인
@@ -39,27 +40,25 @@ docker-compose build --no-cache stockservice    # stock 서비스 캐시 없이 
 psql -U postgres -d your_database_name
 
 
+docker compose restart
 
-docker-compose down  
-모든 관련 이미지를삭제:
-docker rmi $(docker images 'ai-server*' -q)  
-Docker 캐시 정리  
-docker system prune -a 
-다시 빌드 
-docker-compose build --no-cache  
-컴포즈업 
-docker-compose up
+docker compose -p crime-service down 
+docker compose -p crime-service build --no-cache
+docker compose -p crime-service up -d
 
-
-
-# 1. 컨테이너 중지
 docker-compose down
-
-# 2. crime-service만 재빌드
-docker-compose build --no-cache crime-service
-
-# 3. 서비스 재시작
+docker-compose build --no-cache 
 docker-compose up -d
 
+docker-compose down  
+docker rmi $(docker images 'ai-server*' -q)  
+docker system prune -a 
+docker-compose build --no-cache  
+docker-compose up
 
-docker compose restart
+docker-compose logs --tail=500 -f gateway        
+docker-compose logs --tail=500 -f crime-service  
+docker logs crime-service-crime-service-1
+
+
+docker compose exec nlp-service pip list

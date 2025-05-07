@@ -1,0 +1,11 @@
+services:
+  nlp-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7000:7000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app 
